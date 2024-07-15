@@ -11,7 +11,7 @@ let btn1 = document.getElementById("btn1");
 let btn2 = document.getElementById("btn2");
 
 function sendItem(item) {
-    fetch('/api/add-item', {
+    fetch('http://localhost:8080/api/addItem', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
