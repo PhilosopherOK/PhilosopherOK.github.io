@@ -5,73 +5,18 @@ tg.expand();
 tg.MainButton.textColor = '#FFFFFF';
 tg.MainButton.color = '#2cab37';
 
-let selectedItems = [];
+let item = "";
 
-// Функция для загрузки продуктов из API
-function loadProducts() {
-    fetch('http://localhost:8080/api/products')
-        .then(response => response.json())
-        .then(products => {
-            const productsContainer = document.getElementById('productsContainer');
-            products.forEach(product => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+let btn1 = document.getElementById("btn1");
+let btn2 = document.getElementById("btn2");
 
-                const img = document.createElement('img');
-                img.src = product.pathOfPhoto;
-                img.alt = product.nameOfPosition;
-                img.className = 'img';
-
-                const btn = document.createElement('button');
-                btn.className = 'btn';
-                btn.innerText = `Add ${product.nameOfPosition}`;
-                btn.addEventListener('click', function() {
-                    toggleItemSelection(product.productId, product.nameOfPosition);
-                });
-
-                itemDiv.appendChild(img);
-                itemDiv.appendChild(btn);
-                productsContainer.appendChild(itemDiv);
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching products:', error);
-        });
-}
-
-// Функция для обработки выбора продукта
-function toggleItemSelection(productId, productName) {
-    const index = selectedItems.indexOf(productId);
-    if (index > -1) {
-        selectedItems.splice(index, 1);
-        tg.MainButton.setText(`Removed ${productName}`);
-    } else {
-        selectedItems.push(productId);
-        tg.MainButton.setText(`Selected ${productName}`);
-    }
-
-    if (selectedItems.length > 0) {
-        tg.MainButton.show();
-    } else {
-        tg.MainButton.hide();
-    }
-}
-
-// Функция для отправки выбранных продуктов
-function sendSelectedItems() {
-    const chatId = tg.initDataUnsafe.user.id; // Телеграм ID пользователя
-    const data = {
-        chatId: chatId,
-        productsId: selectedItems,
-        localDateTime: new Date().toISOString() // Текущая дата и время
-    };
-
-    fetch('http://localhost:8080/api/addOrder', {
+function sendItem(item) {
+    fetch('http://localhost:8080/api/addItem', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(item)
     }).then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -82,16 +27,40 @@ function sendSelectedItems() {
     });
 }
 
-tg.onEvent('mainButtonClicked', function() {
-    sendSelectedItems();
+btn1.addEventListener("click", function(){
+    if (tg.MainButton.isVisible) {
+        tg.MainButton.hide();
+    }
+    else {
+        tg.MainButton.setText("Вы выбрали товар 1!");
+        item = "1";
+        tg.MainButton.show();
+        sendItem(item);
+    }
 });
 
-// Загружаем продукты при загрузке страницы
-window.onload = loadProducts;
+btn2.addEventListener("click", function(){
+    if (tg.MainButton.isVisible) {
+        tg.MainButton.hide();
+    }
+    else {
+        tg.MainButton.setText("Вы выбрали товар 2!");
+        item = "2";
+        tg.MainButton.show();
+        sendItem(item);
+    }
+});
 
-// Показ информации о пользователе
+
+Telegram.WebApp.onEvent("mainButtonClicked", function(){
+    tg.sendData(item);
+});
+
 let usercard = document.getElementById("usercard");
+
 let p = document.createElement("p");
 
-p.innerText = `${tg.initDataUnsafe.user.first_name} ${tg.initDataUnsafe.user.last_name}`;
+p.innerText = `${tg.initDataUnsafe.user.first_name}
+${tg.initDataUnsafe.user.last_name}`;
+
 usercard.appendChild(p);
