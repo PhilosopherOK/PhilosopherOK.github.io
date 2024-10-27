@@ -8,7 +8,7 @@ let products = [];
 let cart = new Map();
 
 function loadProducts() {
-    fetch('http://localhost:8080/api/products') 
+    fetch('http://13.49.67.24:8080/api/products') 
         .then(response => response.json())
         .then(data => {
             products = data;
@@ -167,7 +167,7 @@ document.getElementById('submitOrderBtn').addEventListener('click', function() {
         localDateTime: localDateTime
     };
 
-    fetch('http://localhost:8080/api/addOrder', {
+    fetch('http://13.49.67.24:8080/api/addOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
